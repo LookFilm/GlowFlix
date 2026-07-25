@@ -2,7 +2,7 @@
     影片详情页
     
     Created by CuiXg on 2026/05/23.
-    Copyright ©2025深圳幸福社掌上科技有限公司. All rights reserved.
+    Copyright ©2026追光剧场. All rights reserved.
 -->
 <template>
   <div class="content">
@@ -37,11 +37,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import movieApi from "@/api/movieApi";
 import moviePlayer from "@/components/movie/movie-player.vue";
+import movieCrawler from "@/utils/crawler/movie";
 
 const props = defineProps({
-  id: {
+  href: {
     type: String,
     required: true,
   },
@@ -51,17 +51,10 @@ const playerSwipeRef = ref();
 const movieDetail = ref();
 const chapterList = ref<Array<Record<string, any>>>([]);
 
-let staticDomian = import.meta.env.VITE_STATIC_DOMAIN;
-let videoDomian = import.meta.env.VITE_VIDEO_DOMAIN;
-
 onMounted(() => {
-  movieApi.getMovieInfo(props.id).then((detail) => {
-    let info = detail.info;
-    info.cover = staticDomian + info.cover;
+  movieCrawler.crawlDetail(props.href).then((info) => {
     movieDetail.value = info;
-    chapterList.value = detail.info.setList.map((item: Record<string, any>) => {
-      return { id: item.i, playUrl: "" };
-    });
+    chapterList.value = info.videos;
     getChapterPlayInfo(0);
   });
 });
@@ -76,21 +69,16 @@ function getChapterPlayInfo(index: number) {
       reject();
       return;
     }
-
     let chapterInfo = chapterList.value[index];
     if (chapterInfo.playUrl) {
       resolve();
     } else {
-      movieApi
-        .getChapterPlayInfo(props.id, chapterInfo.id)
-        .then((playInfo) => {
-          chapterInfo.playUrl = videoDomian + playInfo.info.url_m3u8;
-          chapterList.value[index] = chapterInfo;
-          resolve();
-        })
-        .catch(() => {
-          reject();
-        });
+      console.log(chapterInfo);
+
+      movieCrawler.crawlVideoUrl(chapterInfo.url).then((url) => {
+        chapterInfo.playUrl = url;
+        resolve();
+      });
     }
   });
 }

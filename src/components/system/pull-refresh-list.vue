@@ -2,7 +2,7 @@
     下拉刷新列表
     
     Created by CuiXg on 2025/05/29.
-    Copyright ©2025深圳幸福社掌上科技有限公司. All rights reserved.
+    Copyright ©2026追光剧场. All rights reserved.
 -->
 <template>
   <div>

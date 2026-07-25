@@ -26,6 +26,13 @@ export default defineConfig(({}) => {
     },
     server: {
       host: "0.0.0.0",
+      proxy: {
+        '/qgiga': {
+          target: "https://m.qgiga.com/",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/qgiga/, '')
+        }
+      }
     },
   };
 });

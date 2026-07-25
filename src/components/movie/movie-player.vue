@@ -2,7 +2,7 @@
     播放器
     
     Created by CuiXg on 2026/05/24.
-    Copyright ©2025深圳幸福社掌上科技有限公司. All rights reserved.
+    Copyright ©2026追光剧场. All rights reserved.
 -->
 <template>
   <div class="video-container">
