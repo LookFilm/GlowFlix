@@ -1,6 +1,6 @@
 export default [
   {
-    path: "detail/:href",
+    path: "detail",
     name: "MovieDetail",
     props: true,
     meta: {

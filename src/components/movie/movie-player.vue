@@ -6,13 +6,7 @@
 -->
 <template>
   <div class="video-container">
-    <video
-      ref="videoRef"
-      playsinline
-      class="video"
-      :src="src"
-      :poster="poster"
-    ></video>
+    <video ref="videoRef" playsinline class="video" :src="src" :poster="poster"></video>
     <div v-show="isShowLoading" class="loading-overlay">
       <van-loading type="spinner" vertical> 加载中... </van-loading>
     </div>
@@ -24,7 +18,7 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import "plyr/dist/plyr.css";
 import Plyr from "plyr";
 
-const emit = defineEmits(["playerInitCompleted", "playCompleted"]);
+const emit = defineEmits(["initCompleted", "completed", "error"]);
 
 const props = defineProps({
   src: { type: String, required: true },
@@ -59,7 +53,7 @@ function initPlayer() {
   player = new Plyr(videoRef.value, playerConfig);
   player.on("ended", (event: any) => {
     // 播放完成
-    emit("playCompleted");
+    emit("completed");
   });
   player.on("loadstart", (event: any) => {
     // 加载开始
@@ -69,7 +63,10 @@ function initPlayer() {
     // 可播放
     isShowLoading.value = false;
   });
-  emit("playerInitCompleted", player);
+  player.on("error", (event: any) => {
+    emit("error");
+  });
+  emit("initCompleted", player);
 }
 </script>
 

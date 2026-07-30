@@ -24,6 +24,7 @@ export default defineConfig(({}) => {
         "@": path.resolve(__dirname, "./src"), // 配置 @ 别名
       },
     },
+
     server: {
       host: "0.0.0.0",
       proxy: {

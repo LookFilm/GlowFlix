@@ -16,13 +16,8 @@ declare module 'vue' {
     PullRefreshList: typeof import('./src/components/system/pull-refresh-list.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    VanEmpty: typeof import('vant/es')['Empty']
-    VanList: typeof import('vant/es')['List']
     VanLoading: typeof import('vant/es')['Loading']
-    VanPullRefresh: typeof import('vant/es')['PullRefresh']
     VanSwipe: typeof import('vant/es')['Swipe']
     VanSwipeItem: typeof import('vant/es')['SwipeItem']
-    VanTab: typeof import('vant/es')['Tab']
-    VanTabs: typeof import('vant/es')['Tabs']
   }
 }

@@ -14,7 +14,7 @@
           v-for="(item, index) in groupItem.list"
           :key="index"
           class="video-list-item"
-          @to-detail="toMovieDetail(item.href)"
+          @to-detail="toMovieDetail(item.path)"
         ></movie-item>
       </div>
     </div>
@@ -33,11 +33,10 @@ onMounted(() => {
   });
 });
 
-function toMovieDetail(href: string) {
+function toMovieDetail(path: string) {
   router.push({
     name: "MovieDetail",
-    query: { href: href },
-    params: { href: href },
+    query: { path: path },
   });
 }
 </script>

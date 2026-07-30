@@ -3,5 +3,7 @@ import "./style.css";
 import App from "./App.vue";
 import router from "./router/index";
 import pinia from "@/store/index";
+// main.js
+import 'vant/lib/index.css'
 
 createApp(App).use(pinia).use(router).mount("#app");

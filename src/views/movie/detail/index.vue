@@ -21,10 +21,11 @@
         class="play-info-item"
       >
         <movie-player
-          :src="item.playUrl"
+          :src="item.url"
           :poster="movieDetail.cover"
-          @play-completed="playNextMovie"
-          @player-init-completed="
+          @completed="playNextMovie"
+          @error="playError"
+          @init-completed="
             (player) => {
               childPlayerInitCompleted(index, player);
             }
@@ -39,61 +40,37 @@
 import { onMounted, ref } from "vue";
 import moviePlayer from "@/components/movie/movie-player.vue";
 import movieCrawler from "@/utils/crawler/movie";
-
-const props = defineProps({
-  href: {
-    type: String,
-    required: true,
-  },
-});
+import router from "@/router";
+import { showToast } from "vant";
 
 const playerSwipeRef = ref();
 const movieDetail = ref();
 const chapterList = ref<Array<Record<string, any>>>([]);
 
 onMounted(() => {
-  movieCrawler.crawlDetail(props.href).then((info) => {
-    movieDetail.value = info;
-    chapterList.value = info.videos;
-    getChapterPlayInfo(0);
-  });
+  const path = router.currentRoute.value.query.path?.toString();
+  if (path) {
+    movieCrawler
+      .crawlDetail(path)
+      .then((info) => {
+        movieDetail.value = info;
+        chapterList.value = info.videos;
+      })
+      .catch((err) => {
+        showToast(err.message);
+      });
+  }
 });
 
-function getChapterPlayInfo(index: number) {
-  return new Promise<void>((resolve, reject) => {
-    if (!chapterList.value) {
-      reject();
-      return;
-    }
-    if (0 > index && index >= chapterList.value.length) {
-      reject();
-      return;
-    }
-    let chapterInfo = chapterList.value[index];
-    if (chapterInfo.playUrl) {
-      resolve();
-    } else {
-      console.log(chapterInfo);
-
-      movieCrawler.crawlVideoUrl(chapterInfo.url).then((url) => {
-        chapterInfo.playUrl = url;
-        resolve();
-      });
-    }
-  });
-}
-
 function playListChange(index: number) {
-  getChapterPlayInfo(index).then(() => {
-    for (let i = 0; i < chapterList.value.length; i++) {
-      const chapterInfo = chapterList.value[i];
-      if (index == i) {
-        chapterInfo.player?.play();
-      } else {
-        chapterInfo.player?.pause();
-      }
+  for (let i = 0; i < chapterList.value.length; i++) {
+    const chapterInfo = chapterList.value[i];
+    if (index == i) {
+      chapterInfo.player?.play();
+    } else {
+      chapterInfo.player?.pause();
     }
-  });
+  }
 }
 
 function childPlayerInitCompleted(index: number, player: any) {
@@ -104,6 +81,13 @@ function childPlayerInitCompleted(index: number, player: any) {
 
 function playNextMovie() {
   playerSwipeRef.value.next();
+}
+
+function playError() {
+  showToast("视频加载失败,即将播放下一视频");
+  setTimeout(() => {
+    playerSwipeRef.value.next();
+  }, 3000);
 }
 </script>
 
