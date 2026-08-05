@@ -45,7 +45,15 @@ function initPlayer() {
   if (!videoRef.value) return;
 
   const playerConfig = {
-    controls: ["play-large", "play", "progress", "current-time", "mute"],
+    controls: [
+      "play-large",
+      "play",
+      "progress",
+      "current-time",
+      "mute",
+      "airplay",
+      "fullscreen",
+    ],
     autoplay: true,
     fullscreen: { enabled: false },
   };
