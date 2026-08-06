@@ -89,6 +89,7 @@ onMounted(() => {
 function typeChange(name: string | number, title: string) {
   if (name !== "home") {
     isRefreshing.value = true;
+    isEmpty.value = false;
   }
 }
 

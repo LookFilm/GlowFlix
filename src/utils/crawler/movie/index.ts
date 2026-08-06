@@ -43,7 +43,9 @@ class MovieCrawler {
             resolve(info);
           })
           .catch((err) => {
+            setTimeout(() => {
             reject(new GFError(0, "获取数据失败"));
+            }, 10000);
           });
       });
     });

@@ -7,7 +7,11 @@
 <template>
   <div>
     <slot name="header"></slot>
-    <van-pull-refresh v-model="isRefreshing" @refresh="onRefresh">
+    <van-pull-refresh
+      style="min-height: 50px"
+      v-model="isRefreshing"
+      @refresh="onRefresh"
+    >
       <van-list
         v-model:loading="isLoading"
         :finished="!hasMoreData"
