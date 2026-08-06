@@ -5,62 +5,62 @@ import { showToast } from "vant";
 
 class MovieCrawler {
   crawlIndex(): Promise<Array<Record<string, any>>> {
-      return new Promise<Array<Record<string, any>>>((resolve, reject) => {
+    return new Promise<Array<Record<string, any>>>((resolve, reject) => {
       fetch(`/data-source/qgiga/index.json`).then((response) => {
-        response.json().then((info) => {
-          resolve(info)
-        }).catch((err)=> {
-          reject(new GFError(0, "获取数据失败"))
-        })
-      })
+        response
+          .json()
+          .then((info) => {
+            resolve(info);
+          })
+          .catch((err) => {
+            reject(new GFError(0, "获取数据失败"));
+          });
+      });
     });
   }
 
-  crawlTypeList(url: string): Promise<Record<string, any>> {
-    return new Promise<Record<string, any>>((resolve, reject) => {
-      pageFetcher
-        .fetchHtml(url)
-        .then((content) => {
-          const $ = cheerio.load(content);
-          const $list = $("div.module")
-            .find("div.module-list")
-            .find("div.module-items");            
-          const list = $list.find("div.module-item").map((_, item) => {
-            const $item = $(item);
-            const $title = $item.find("a.module-item-title");
-
-                     console.log({
-              title: $title.attr("title"),
-              href: $title.attr("href"),
-              image: $item.find("img.lazyload").attr("data-src"),
-              tag: $item.find("div.module-item-text").text().trim(),
-            });
-            return {
-              title: $title.attr("title"),
-              href: $title.attr("href"),
-              cover: $item.find("img.lazyload").attr("data-src"),
-              tag: $item.find("div.module-item-text").text().trim(),
-            };
-   
-            
+  crawlTypeList(): Promise<Array<Record<string, any>>> {
+    return new Promise<Array<Record<string, any>>>((resolve, reject) => {
+      fetch(`/data-source/qgiga/types/index.json`).then((response) => {
+        response
+          .json()
+          .then((info) => {
+            resolve(info);
+          })
+          .catch((err) => {
+            reject(new GFError(0, "获取数据失败"));
           });
-          resolve(list);
-        })
-        .catch((err) => {
-          reject(err);
-        });
+      });
+    });
+  }
+
+  crawlListByType(type: number, page: number): Promise<Record<string, any>> {
+        return new Promise<Array<Record<string, any>>>((resolve, reject) => {
+      fetch(`/data-source/qgiga/types/${type}/${page}.json`).then((response) => {
+        response
+          .json()
+          .then((info) => {
+            resolve(info);
+          })
+          .catch((err) => {
+            reject(new GFError(0, "获取数据失败"));
+          });
+      });
     });
   }
 
   crawlDetail(path: string): Promise<Record<string, any>> {
     return new Promise<Record<string, any>>((resolve, reject) => {
       fetch(`/data-source${path}`).then((response) => {
-        response.json().then((info) => {
-          resolve(info)
-        }).catch((err) => {
-          reject(new GFError(0, "获取数据失败"))
-        })
-      })
+        response
+          .json()
+          .then((info) => {
+            resolve(info);
+          })
+          .catch((err) => {
+            reject(new GFError(0, "获取数据失败"));
+          });
+      });
     });
   }
 
