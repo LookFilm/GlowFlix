@@ -11,6 +11,7 @@
       color="#6C47FF"
       title-active-color="#6C47FF"
       class="type-tabs"
+      @change="typeChange"
     >
       <van-tab name="home" title="首页" />
       <van-tab
@@ -38,17 +39,18 @@
 
     <pull-refresh-list
       v-else
-      v-model:refreshing="refreshing"
-      v-model:loading="loading"
-      :has-more-data="hasMoreData"
-      :is-empty="categoryList.length === 0"
-      @refresh="handleRefresh"
-      @load-more="handleLoadMore"
+      v-model:refreshing="isRefreshing"
+      v-model:loading="isLoading"
+      :has-more-data="isHasMoreData"
+      :is-empty="isEmpty"
+      @refresh="refreshList"
+      @load-more="loadMore"
+      class="video-list-container"
     >
       <div class="video-list">
         <movie-item
           :movie-item="item"
-          v-for="(item, index) in categoryList"
+          v-for="(item, index) in movieList"
           :key="index"
           class="video-list-item"
           @to-detail="toMovieDetail(item.path)"
@@ -59,18 +61,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import movieCrawler from "@/utils/crawler/movie";
 import router from "@/router";
+import PullRefreshList from "@/components/system/pull-refresh-list.vue";
 
 const groupList = ref<Array<Record<string, any>>>([]);
 const typeList = ref<Array<Record<string, any>>>([]);
-const categoryList = ref<Array<Record<string, any>>>([]);
 const activeType = ref<string | number>("home");
-const refreshing = ref(false);
-const loading = ref(false);
-const hasMoreData = ref(true);
-const currentPage = ref(1);
+
+const isRefreshing = ref(false);
+const isLoading = ref(false);
+const isHasMoreData = ref(false);
+const isEmpty = ref(false);
+var pageNo = 1;
+const movieList = ref<Array<Record<string, any>>>([]);
 
 onMounted(() => {
   Promise.all([movieCrawler.crawlIndex(), movieCrawler.crawlTypeList()]).then(
@@ -81,56 +86,41 @@ onMounted(() => {
   );
 });
 
-watch(activeType, (newType) => {
-  if (newType === "home") {
-    return;
-  }
-
-  currentPage.value = 1;
-  hasMoreData.value = true;
-  categoryList.value = [];
-  loading.value = false;
-  refreshing.value = false;
-  loadCategoryList(true);
-});
-
-async function loadCategoryList(reset = false) {
-  if (activeType.value === "home") {
-    return;
-  }
-
-  const page = reset ? 1 : currentPage.value;
-  try {
-    const info = await movieCrawler.crawlListByType(Number(activeType.value), page);
-    const list = Array.isArray(info?.list) ? info.list : [];
-
-    if (reset) {
-      categoryList.value = list;
-    } else {
-      categoryList.value = [...categoryList.value, ...list];
-    }
-
-    hasMoreData.value = parseInt(info.page) < parseInt(info.totalPage);
-    currentPage.value = reset ? 2 : page + 1;
-  } catch (error) {
-    hasMoreData.value = false;
-    // categoryList.value = [];
-  } finally {
-    loading.value = false;
-    refreshing.value = false;
+function typeChange(name: string | number, title: string) {
+  if (name !== "home") {
+    isRefreshing.value = true;
   }
 }
 
-function handleRefresh() {
-  loadCategoryList(true);
+function refreshList() {
+  movieList.value = [];
+  movieCrawler
+    .crawlListByType(Number(activeType.value), 1)
+    .then((pageInfo) => {
+      pageNo = pageInfo.page;
+      movieList.value = pageInfo.list;
+      isRefreshing.value = false;
+      isEmpty.value = pageInfo.count == 0;
+      isHasMoreData.value = pageInfo.page < pageInfo.pageCount;
+    })
+    .catch(() => {
+      isRefreshing.value = false;
+    });
 }
 
-function handleLoadMore() {
-  if (!hasMoreData.value) {
-    loading.value = false;
-    return;
-  }
-  loadCategoryList(false);
+function loadMore() {
+  movieCrawler
+    .crawlListByType(Number(activeType.value), pageNo + 1)
+    .then((pageInfo) => {
+      pageNo = pageInfo.page;
+      movieList.value = movieList.value.concat(pageInfo.list);
+      isLoading.value = false;
+      isEmpty.value = pageInfo.total == 0;
+      isHasMoreData.value = pageInfo.page < pageInfo.totalPage;
+    })
+    .catch(() => {
+      isLoading.value = false;
+    });
 }
 
 function toMovieDetail(path: string) {
@@ -144,6 +134,7 @@ function toMovieDetail(path: string) {
 <style lang="scss" scoped>
 .home-page {
   padding-bottom: 16px;
+  background-color: #f5f5f5;
 }
 
 .type-tabs {
@@ -155,6 +146,10 @@ function toMovieDetail(path: string) {
   font-weight: 700;
   font-size: 18px;
   color: #101010;
+}
+
+.video-list-container {
+  min-height: calc(100vh - 50px);
 }
 
 .video-list {

@@ -11,9 +11,7 @@
       <van-list
         v-model:loading="isLoading"
         :finished="!hasMoreData"
-        :finished-text="
-          isEmpty || isRefreshing || isLoading ? '' : '没有更多内容'
-        "
+        :finished-text="isEmpty || isRefreshing || isLoading ? '' : '没有更多内容'"
         @load="onLoadMore"
       >
         <slot v-if="!isEmpty"></slot>
@@ -48,6 +46,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["refresh", "loadMore", "update:refreshing", "update:loading"]);
+
 const isRefreshing = ref(false);
 const isLoading = ref(false);
 
@@ -67,15 +67,8 @@ watch(
       }
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
-
-const emit = defineEmits([
-  "refresh",
-  "loadMore",
-  "update:refreshing",
-  "update:loading",
-]);
 
 function onRefresh() {
   emit("update:refreshing", true);
