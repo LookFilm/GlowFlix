@@ -72,7 +72,7 @@ const activeType = ref<string | number>("home");
 
 const isRefreshing = ref(false);
 const isLoading = ref(false);
-const isHasMoreData = ref(false);
+const isHasMoreData = ref(true);
 const isEmpty = ref(false);
 var pageNo = 1;
 const movieList = ref<Array<Record<string, any>>>([]);
@@ -90,6 +90,7 @@ function typeChange(name: string | number, title: string) {
   if (name !== "home") {
     isRefreshing.value = true;
     isEmpty.value = false;
+    isHasMoreData.value = true;
   }
 }
 
@@ -98,11 +99,11 @@ function refreshList() {
   movieCrawler
     .crawlListByType(Number(activeType.value), 1)
     .then((pageInfo) => {
-      pageNo = pageInfo.page;
+      pageNo = parseInt(pageInfo.page);
       movieList.value = pageInfo.list;
       isRefreshing.value = false;
       isEmpty.value = pageInfo.count == 0;
-      isHasMoreData.value = pageInfo.page < pageInfo.pageCount;
+      isHasMoreData.value = parseInt(pageInfo.page) < parseInt(pageInfo.pageCount);
     })
     .catch(() => {
       isRefreshing.value = false;
@@ -113,11 +114,11 @@ function loadMore() {
   movieCrawler
     .crawlListByType(Number(activeType.value), pageNo + 1)
     .then((pageInfo) => {
-      pageNo = pageInfo.page;
+      pageNo = parseInt(pageInfo.page);
       movieList.value = movieList.value.concat(pageInfo.list);
       isLoading.value = false;
       isEmpty.value = pageInfo.total == 0;
-      isHasMoreData.value = pageInfo.page < pageInfo.totalPage;
+      isHasMoreData.value = parseInt(pageInfo.page) < parseInt(pageInfo.totalPage);
     })
     .catch(() => {
       isLoading.value = false;
