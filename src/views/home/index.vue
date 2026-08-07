@@ -6,22 +6,23 @@
 -->
 <template>
   <div class="home-page">
-    <van-tabs
-      v-model:active="activeType"
-      color="#6C47FF"
-      title-active-color="#6C47FF"
-      class="type-tabs"
-      @change="typeChange"
-    >
-      <van-tab name="home" title="首页" />
-      <van-tab
-        v-for="typeItem in typeList"
-        :key="typeItem.id"
-        :name="typeItem.id"
-        :title="typeItem.title"
-      />
-    </van-tabs>
-
+    <van-sticky>
+      <van-tabs
+        v-model:active="activeType"
+        color="#6C47FF"
+        title-active-color="#6C47FF"
+        class="type-tabs"
+        @change="typeChange"
+      >
+        <van-tab name="home" title="首页" />
+        <van-tab
+          v-for="typeItem in typeList"
+          :key="typeItem.id"
+          :name="typeItem.id"
+          :title="typeItem.title"
+        />
+      </van-tabs>
+    </van-sticky>
     <div v-if="activeType === 'home'">
       <div v-for="(groupItem, groupIndex) in groupList" :key="groupIndex">
         <div class="group-title">{{ groupItem.title }}</div>
@@ -107,6 +108,8 @@ function refreshList() {
     })
     .catch(() => {
       isRefreshing.value = false;
+      isLoading.value = false;
+      isHasMoreData.value = false;
     });
 }
 
@@ -122,6 +125,8 @@ function loadMore() {
     })
     .catch(() => {
       isLoading.value = false;
+      isRefreshing.value = false;
+      isHasMoreData.value = false;
     });
 }
 
@@ -140,7 +145,7 @@ function toMovieDetail(path: string) {
 }
 
 .type-tabs {
-  margin: 8px 0 0;
+  margin: 0;
 }
 
 .group-title {
