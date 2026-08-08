@@ -6,6 +6,14 @@
 -->
 <template>
   <div class="content">
+    <van-sticky>
+      <van-nav-bar
+        :title="movieDetail?.name"
+        left-arrow
+        @click-left="back"
+        class="nav-bar"
+      />
+    </van-sticky>
     <van-swipe
       ref="playerSwipeRef"
       class="play-info"
@@ -62,6 +70,10 @@ onMounted(() => {
   }
 });
 
+function back() {
+  router.back();
+}
+
 function playListChange(index: number) {
   for (let i = 0; i < chapterList.value.length; i++) {
     const chapterInfo = chapterList.value[i];
@@ -93,14 +105,25 @@ function playError() {
 
 <style lang="scss" scoped>
 .content {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom);
   background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  -ms-overflow-style: none; /* IE 和 Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* 隐藏滚动条 */
+.content::-webkit-scrollbar {
+  display: none; /* 对于 Webkit 浏览器 */
 }
 
 .play-info {
-  height: 100%;
+  flex-grow: 1;
 }
 
 .play-info-item {

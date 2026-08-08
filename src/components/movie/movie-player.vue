@@ -53,9 +53,9 @@ function initPlayer() {
       "mute",
       "airplay",
       "fullscreen",
+      "pip",
     ],
     autoplay: true,
-    fullscreen: { enabled: false },
   };
 
   player = new Plyr(videoRef.value, playerConfig);

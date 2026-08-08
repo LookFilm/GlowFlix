@@ -3,5 +3,10 @@ import { RouterView } from "vue-router";
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <router-view v-slot="{ Component, route }">
+    <keep-alive>
+      <component :is="Component" v-if="route.meta.keepAlive" :key="route.fullPath" />
+    </keep-alive>
+    <component :is="Component" v-if="!route.meta.keepAlive" :key="route.fullPath" />
+  </router-view>
 </template>

@@ -1,4 +1,4 @@
-import {  createMemoryHistory, createRouter } from "vue-router";
+import {  createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 import movieRouter from "@/router/modules/movie";
 import HomeView from "@/views/home/index.vue";
 
@@ -9,11 +9,13 @@ declare module "vue-router" {
   interface RouteMeta {
     // 导航标题
     title: string;
+
+    keepAlive?: boolean;
   }
 }
 
 const routes = [
-  { path: "/", meta: { title: "追光剧场" }, component: HomeView },
+  { path: "/", meta: { title: "追光剧场", keepAlive: true }, component: HomeView },
   {
     path: "/movie",
     name: "Movie",
@@ -22,8 +24,15 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { left: 0, top: 0 };
+    }
+  }
 });
 
 router.beforeEach((to, _, next) => {
